@@ -20,6 +20,7 @@ class Cliente(models.Model):
     nombre = models.CharField(max_length=120)
     email = models.EmailField(blank=True, null=True, unique=True)
     telefono = models.CharField(max_length=30, blank=True)
+    activo = models.BooleanField(default=True)
 
     class Meta:
         ordering = ["nombre"]

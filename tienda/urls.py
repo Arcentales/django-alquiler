@@ -12,6 +12,7 @@ urlpatterns = [
     # Peliculas
     path("peliculas/", views.PeliculaListView.as_view(), name="pelicula_list"),
     path("peliculas/nueva/", views.PeliculaCreateView.as_view(), name="pelicula_create"),
+    path("peliculas/<int:pk>/", views.PeliculaDetailView.as_view(), name="pelicula_detail"),
     path("peliculas/<int:pk>/editar/", views.PeliculaUpdateView.as_view(), name="pelicula_update"),
     path("peliculas/<int:pk>/eliminar/", views.PeliculaDeleteView.as_view(), name="pelicula_delete"),
     # Clientes
@@ -31,4 +32,3 @@ urlpatterns = [
     path("ventas/", views.VentasListView.as_view(), name="ventas_list"),
     path("ventas/simular/", views.simular_ventas, name="ventas_simular"),
 ]
-

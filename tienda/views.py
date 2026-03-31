@@ -1,13 +1,14 @@
 import datetime
 import random
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views import View
-from django.views.generic import CreateView, DeleteView, ListView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from .forms import AlquilerCreateForm, MarcarPagadoForm, SimularVentasForm
 from .models import Alquiler, Categoria, Cliente, Pelicula
@@ -36,6 +37,8 @@ def index(request: HttpRequest) -> HttpResponse:
     )
 
 
+# ── Categorias ────────────────────────────────────────────────────────────────
+
 class CategoriaListView(ListView):
     model = Categoria
     template_name = "tienda/categoria_list.html"
@@ -44,7 +47,6 @@ class CategoriaListView(ListView):
 
 class CategoriaCreateView(CreateView):
     model = Categoria
-    form_class = None  # se usa el form del modelo con campos del template
     fields = ["nombre", "descripcion"]
     template_name = "tienda/categoria_form.html"
     success_url = reverse_lazy("categoria_list")
@@ -52,7 +54,6 @@ class CategoriaCreateView(CreateView):
 
 class CategoriaUpdateView(UpdateView):
     model = Categoria
-    form_class = None
     fields = ["nombre", "descripcion"]
     template_name = "tienda/categoria_form.html"
     success_url = reverse_lazy("categoria_list")
@@ -63,6 +64,8 @@ class CategoriaDeleteView(DeleteView):
     template_name = "tienda/categoria_confirm_delete.html"
     success_url = reverse_lazy("categoria_list")
 
+
+# ── Clientes ──────────────────────────────────────────────────────────────────
 
 class ClienteListView(ListView):
     model = Cliente
@@ -90,10 +93,23 @@ class ClienteDeleteView(DeleteView):
     success_url = reverse_lazy("cliente_list")
 
 
+# ── Peliculas ─────────────────────────────────────────────────────────────────
+
 class PeliculaListView(ListView):
     model = Pelicula
     template_name = "tienda/pelicula_list.html"
     context_object_name = "peliculas"
+
+
+class PeliculaDetailView(DetailView):
+    model = Pelicula
+    template_name = "tienda/pelicula_detail.html"
+    context_object_name = "pelicula"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["alquileres"] = self.object.alquileres.select_related("cliente").order_by("-fecha_alquiler")
+        return ctx
 
 
 class PeliculaCreateView(CreateView):
@@ -116,7 +132,9 @@ class PeliculaDeleteView(DeleteView):
     success_url = reverse_lazy("pelicula_list")
 
 
-class AlquilerCreateView(CreateView):
+# ── Alquileres ────────────────────────────────────────────────────────────────
+
+class AlquilerCreateView(LoginRequiredMixin, CreateView):
     model = Alquiler
     form_class = AlquilerCreateForm
     template_name = "tienda/alquiler_form.html"
@@ -156,6 +174,8 @@ class MarcarPagadoView(View):
         return render(request, self.template_name, {"alquiler": alquiler, "form": form})
 
 
+# ── Ventas ────────────────────────────────────────────────────────────────────
+
 class VentasListView(ListView):
     model = Alquiler
     template_name = "tienda/ventas_list.html"
@@ -192,18 +212,13 @@ def simular_ventas(request: HttpRequest) -> HttpResponse:
                     {"form": form, "error": "Necesitas al menos 1 cliente y 1 película para simular."},
                 )
 
-            # Generamos fechas aleatorias en el rango.
-            alquileres_creados = 0
             delta_dias = (hasta - desde).days if hasta >= desde else 0
 
             for _ in range(numero):
                 cliente = random.choice(clientes)
                 pelicula = random.choice(peliculas)
-
                 offset = random.randint(0, max(delta_dias, 0))
                 fecha_alquiler = desde + datetime.timedelta(days=offset)
-
-                # En esta versión simple, una "venta" es un alquiler marcado como pagado.
                 fecha_devolucion = fecha_alquiler + datetime.timedelta(days=random.randint(0, 7))
                 Alquiler.objects.create(
                     cliente=cliente,
@@ -212,7 +227,6 @@ def simular_ventas(request: HttpRequest) -> HttpResponse:
                     pagado=True,
                     fecha_devolucion=fecha_devolucion,
                 )
-                alquileres_creados += 1
 
             return redirect("ventas_list")
     else:
@@ -225,4 +239,3 @@ def simular_ventas(request: HttpRequest) -> HttpResponse:
         )
 
     return render(request, "tienda/simular_ventas.html", {"form": form})
-

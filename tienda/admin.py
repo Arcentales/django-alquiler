@@ -11,7 +11,7 @@ class CategoriaAdmin(admin.ModelAdmin):
 
 @admin.register(Cliente)
 class ClienteAdmin(admin.ModelAdmin):
-    list_display = ["nombre", "email", "telefono"]
+    list_display = ["nombre", "email", "telefono", "activo"]
     search_fields = ["nombre", "email"]
 
 

@@ -17,13 +17,23 @@
             <div style="font-size: 14px; color: #6b7280">Alquileres pendientes</div>
             <div style="font-size: 28px; font-weight: 700">{{ alquileres_pendientes }}</div>
         </div>
-            <div class="card">
+        <div class="card">
             <div style="font-size: 14px; color: #6b7280">Ingresos (ventas)</div>
-                <div style="font-size: 28px; font-weight: 700">{{ ingresos|soles }}</div>
+            <div style="font-size: 28px; font-weight: 700">{{ ingresos|soles }}</div>
         </div>
     </div>
 
     <div class="card">
+        {% if alquileres_pendientes %}
+            <p style="color: #b45309; background: #fef3c7; padding: 10px 14px; border-radius: 6px; margin-top: 0">
+                ⚠ Hay {{ alquileres_pendientes }} alquiler{{ alquileres_pendientes|pluralize:",es" }} pendiente{{ alquileres_pendientes|pluralize:",s" }} de cobro.
+            </p>
+        {% else %}
+            <p style="color: #15803d; background: #dcfce7; padding: 10px 14px; border-radius: 6px; margin-top: 0">
+                ✓ Todo al día, sin pendientes.
+            </p>
+        {% endif %}
+
         <h2 style="margin-top: 0">Acciones rápidas</h2>
         <div class="actions">
             <a class="btn" href="{% url 'categoria_create' %}">Nueva categoría</a>
@@ -33,8 +43,7 @@
             <a class="btn secondary" href="{% url 'ventas_simular' %}">Simular ventas</a>
         </div>
         <p class="help" style="margin-bottom: 0">
-            En esta versión, una “venta” es un <b>alquiler marcado como pagado</b>.
+            En esta versión, una "venta" es un <b>alquiler marcado como pagado</b>.
         </p>
     </div>
 {% endblock %}
-

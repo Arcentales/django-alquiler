@@ -26,6 +26,11 @@ class PeliculaForm(forms.ModelForm):
 
 
 class AlquilerCreateForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["cliente"].queryset = Cliente.objects.filter(activo=True)
+
     class Meta:
         model = Alquiler
         fields = ["cliente", "pelicula"]
@@ -52,11 +57,9 @@ class SimularVentasForm(forms.Form):
         if desde and hasta and desde > hasta:
             raise forms.ValidationError("La fecha 'Desde' no puede ser posterior a 'Hasta'.")
 
-        # Si no se manda rango, usaremos la fecha de hoy.
         if not desde and not hasta:
             today = datetime.date.today()
             cleaned["desde"] = today
             cleaned["hasta"] = today
 
         return cleaned
-
