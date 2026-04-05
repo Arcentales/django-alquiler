@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ pelicula.titulo }} ({{ pelicula.anio }})</h2>
+<p><strong>Categoría:</strong> {{ pelicula.categoria }}</p>
+<p><strong>Precio de alquiler:</strong> S/ {{ pelicula.precio_alquiler }}</p>
+
+<h3>Alquileres de esta película</h3>
+{% if alquileres %}
+<table>
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Cliente</th>
+      <th>Pagado</th>
+      <th>Precio</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for a in alquileres %}
+    <tr>
+      <td>{{ a.fecha_alquiler }}</td>
+      <td>{{ a.cliente }}</td>
+      <td>{% if a.pagado %}Sí{% else %}No{% endif %}</td>
+      <td>S/ {{ a.precio }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>Esta película no tiene alquileres registrados.</p>
+{% endif %}
+
+<br>
+<a href="{% url 'pelicula_list' %}">← Volver a películas</a>
+{% endblock %}
