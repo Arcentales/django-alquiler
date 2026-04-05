@@ -143,10 +143,10 @@ python manage.py startapp tienda
 ### 8.3. Conectar la app
 
 - En `alquiler_site/settings.py`:
-    - Agregar `'tienda'` a `INSTALLED_APPS`.
-    - Configurar `TEMPLATES['DIRS']` para que encuentre `templates/`.
+  - Agregar `'tienda'` a `INSTALLED_APPS`.
+  - Configurar `TEMPLATES['DIRS']` para que encuentre `templates/`.
 - En `alquiler_site/urls.py`:
-    - Incluir `path('', include('tienda.urls'))`.
+  - Incluir `path('', include('tienda.urls'))`.
 
 ### 8.4. Modelos y base de datos
 
@@ -271,55 +271,183 @@ python manage.py runserver
 
 ---
 
-## 12. Tareas de refuerzo (con entregables claros)
+## 12. 100 retos de Django puro (nivel desafío)
 
-Cada tarea incluye **qué deben lograr** y **qué deben entregar** para que el docente evalúe sin ambigüedad.
+> Objetivo: dominar Django de verdad.  
+> Regla: resolver sin frameworks externos (solo Django y librería estándar de Python).
 
-### Tarea 1 — Disponibilidad de películas
+### Truco anti copia/pega (diferencial por alumno)
 
-- **Objetivo:** Agregar a `Pelicula` un campo booleano `disponible` (por defecto `True`).
-- **Comportamiento:** En “Nuevo alquiler”, solo deben listarse películas con `disponible=True`.
-- **Entregar:**
-    - Código (migración incluida).
-    - Captura de pantalla del formulario mostrando el filtro (antes/después).
-    - 2–3 líneas explicando qué consulta del ORM usaron (o en qué parte del formulario lo filtraron).
+Para evitar que se pasen el repositorio ya hecho, este proyecto incluye un comando Django que genera
+un **paquete de retos personalizado por alumno** con:
 
-### Tarea 2 — Reporte de ventas por categoría
+- token único de entrega
+- parámetros de negocio distintos por estudiante
+- subconjunto de retos asignados
+- nombre de rama obligatoria para entrega
 
-- **Objetivo:** En “Ventas”, permitir elegir una **categoría** y ver:
-    - listado filtrado
-    - **total** de ingresos de esa categoría
-- **Entregar:**
-    - Captura con al menos 2 categorías distintas probadas.
-    - Explicación: “¿por qué el total cambia al filtrar?”
+Comando:
 
-### Tarea 3 — Simulación con rango de precios
+```bash
+python manage.py generar_reto_personalizado --alumno "Nombre Apellido" --codigo "2026A001"
+```
 
-- **Objetivo:** Extender “Simular ventas” para que el usuario ingrese **precio mínimo** y **precio máximo** en soles.
-- **Comportamiento:** Cada alquiler simulado debe guardar un `precio` aleatorio dentro del rango (y seguir marcado como pagado).
-- **Entregar:**
-    - Breve prueba: correr simulación y mostrar en `/ventas/` que los precios caen en el rango.
+Salida esperada:
 
-### Tarea 4 — Exportar ventas a CSV
+- archivo JSON en `retos/<alumno>-<codigo>.json`
+- token único (ejemplo: `A1B2C3D4E5F6`)
 
-- **Objetivo:** Agregar una acción (botón o URL) que descargue un archivo `.csv` con columnas:
-    - fecha, cliente, película, categoría, precio
-- **Entregar:**
-    - Archivo CSV de ejemplo generado por la app.
-    - Código de la vista (comentario: cómo evitan incluir comas rotas en textos, si aplica).
 
-### Tarea 5 — Validación: no duplicar alquiler el mismo día
+{
+    "alumno": "juan luis arcentales panduro",
+    "codigo": "01618058",
+    "token": "NAFESV80A3QH",
+    "rama_obligatoria": "alumno/juan-luis-arcentales-panduro-NAFE",
+    "parametros": {
+        "impuesto": 0.1,
+        "descuento_max": 5,
+        "moneda": "USD",
+        "dias_gracia": 2
+    }
+}
 
-- **Objetivo:** Evitar que el mismo `cliente` alquile la misma `pelicula` con la misma `fecha_alquiler`.
-- **Comportamiento:** Mostrar error de validación amigable en el formulario.
-- **Entregar:**
-    - Captura del error.
-    - Explicación: ¿validaron en el `ModelForm`, en el `Model.clean()`, o en la vista? ¿por qué?
 
-### Tarea 6 (opcional +1 punto) — Prueba automática mínima
+Regla de clase recomendada:
 
-- **Objetivo:** Escribir un test en `tienda/tests.py` que verifique una regla (por ejemplo, que al crear un alquiler se asigne precio).
-- **Entregar:** `python manage.py test` pasando en su máquina.
+1. Cada alumno trabaja en su rama obligatoria (`alumno/<slug>-<token4>`).
+2. Debe incluir su token en el README de su entrega y en el commit final.
+3. Debe implementar los parámetros de negocio que le salieron en su JSON.
+4. Si la entrega no coincide con su token/parámetros, se considera no válida.
+
+### Bloque A — Modelos, relaciones y restricciones (1–10)
+
+1. Agregar `stock` en `Pelicula` y evitar alquiler si `stock <= 0`.
+2. Crear campo `dni` único en `Cliente` con validación de longitud.
+3. Agregar `slug` único en `Pelicula` y autogenerarlo desde el título.
+4. Añadir `estado` en `Alquiler` con choices (`pendiente`, `pagado`, `anulado`).
+5. Registrar `fecha_pago` cuando un alquiler pase a `pagado`.
+6. Crear modelo `MetodoPago` y asociarlo opcionalmente al alquiler.
+7. Agregar `duracion_minutos` en película con `MinValueValidator`.
+8. Agregar `director` y `pais_origen` en película.
+9. Restringir `fecha_devolucion >= fecha_alquiler`.
+10. Crear `UniqueConstraint` para impedir alquiler duplicado mismo cliente/película/fecha.
+
+### Bloque B — ORM avanzado y consultas (11–20)
+
+1. Listar top 10 películas más alquiladas con `annotate(Count(...))`.
+2. Calcular ingreso total por categoría con `values().annotate(Sum(...))`.
+3. Obtener clientes sin alquileres usando `annotate` + filtro.
+4. Mostrar ticket promedio (`Avg`) de alquileres pagados.
+5. Crear consulta para alquileres vencidos (pendientes y con fecha pasada).
+6. Implementar ranking mensual de clientes por gasto total.
+7. Calcular total de ventas por día en rango de fechas.
+8. Filtrar películas por múltiples criterios combinables (año, categoría, precio).
+9. Usar `select_related`/`prefetch_related` en listados para optimizar consultas.
+10. Demostrar en documentación la diferencia de consultas con y sin optimización.
+
+### Bloque C — Formularios y validaciones serias (21–30)
+
+1. Crear `ModelForm` de película con validación de año no mayor al actual.
+2. Validar que el título no sea vacío tras `strip()`.
+3. Añadir validación de precio mínimo configurable por setting.
+4. Mostrar errores globales (`non_field_errors`) en formularios.
+5. Validar que una devolución no se marque antes del alquiler.
+6. Agregar ayuda contextual (`help_text`) en todos los formularios principales.
+7. Crear formulario de búsqueda avanzada para alquileres.
+8. Implementar formulario de “cobro masivo” por IDs de alquiler.
+9. Crear formulario para importar clientes desde CSV con validaciones.
+10. Crear formulario para actualizar precios por categoría en lote.
+
+### Bloque D — Vistas basadas en clases y mixins (31–40)
+
+1. Reescribir un CRUD completo usando solo CBV.
+2. Crear mixin para requerir usuario autenticado en vistas privadas.
+3. Crear mixin reusable para paginación + ordenamiento.
+4. Implementar `DetailView` de cliente con historial de alquileres.
+5. Implementar `DetailView` de película con métricas (veces alquilada).
+6. Crear `FormView` para simulación de ventas con resumen al finalizar.
+7. Crear `TemplateView` de dashboard con KPIs.
+8. Implementar borrado lógico (`is_active`) en vez de `DeleteView` físico.
+9. Agregar vista para restaurar registros “borrados lógicamente”.
+10. Crear vista para cerrar caja diaria y bloquear nuevas ventas del día.
+
+### Bloque E — URLs, navegación y UX backend (41–50)
+
+1. Diseñar esquema de URLs RESTful consistente para toda la app.
+2. Agregar namespaces de app (`app_name`) y uso completo de `reverse`.
+3. Mantener filtros en querystring durante paginación y ordenamiento.
+4. Agregar breadcrumbs dinámicos con contexto en plantillas.
+5. Crear páginas 404 y 500 personalizadas.
+6. Agregar mensajes `success/error/warning` en operaciones clave.
+7. Implementar botón “volver al listado filtrado” usando `next`.
+8. Crear vista de inicio con métricas cacheadas por 60 segundos.
+9. Agregar vista de auditoría de acciones recientes.
+10. Crear navegación condicional según permisos del usuario.
+
+### Bloque F — Admin profesional (51–60)
+
+1. Mejorar `ModelAdmin` con `list_display`, `search_fields` y `list_filter`.
+2. Agregar acciones personalizadas en admin (marcar pagados en lote).
+3. Mostrar columnas calculadas en admin (total gastado por cliente).
+4. Crear `InlineModelAdmin` para visualizar alquileres desde cliente.
+5. Evitar edición de campos sensibles en admin si no es superuser.
+6. Agregar filtros por rango de fechas personalizados en admin.
+7. Configurar `readonly_fields` según estado del alquiler.
+8. Optimizar admin con `autocomplete_fields`.
+9. Añadir validaciones en admin para evitar inconsistencias.
+10. Documentar 10 atajos útiles del admin en el README.
+
+### Bloque G — Autenticación, autorización y seguridad (61–70)
+
+1. Proteger vistas de escritura con `LoginRequiredMixin`.
+2. Crear grupos (`cajero`, `supervisor`) y permisos por grupo.
+3. Restringir simulación de ventas solo a `supervisor`.
+4. Implementar política de permisos por objeto (ejemplo simple en vista).
+5. Mover `DEBUG` y `SECRET_KEY` a variables de entorno.
+6. Configurar `CSRF_COOKIE_SECURE` y `SESSION_COOKIE_SECURE` por entorno.
+7. Agregar protección de tasa básica para formularios críticos (simple, en sesión).
+8. Registrar intentos de login fallidos en una tabla de auditoría.
+9. Forzar cambio de contraseña inicial para usuarios nuevos.
+10. Implementar cierre de sesión automático por inactividad.
+
+### Bloque H — Señales, transacciones y consistencia (71–80)
+
+1. Usar `transaction.atomic` al crear alquiler + actualizar stock.
+2. Revertir stock automáticamente cuando se anula un alquiler.
+3. Crear señal `post_save` para registrar eventos de negocio.
+4. Crear señal `post_delete` para registrar eliminación en auditoría.
+5. Evitar dobles cobros con bloqueo transaccional (`select_for_update`).
+6. Implementar idempotencia simple para marcar pago.
+7. Registrar historial de cambios de precio de película.
+8. Crear modelo `EventoDominio` para trazabilidad de acciones clave.
+9. Implementar validación cruzada entre modelos en `clean()`.
+10. Probar escenario de concurrencia con tests transaccionales.
+
+### Bloque I — Testing serio en Django (81–90)
+
+1. Escribir tests de modelos para todas las validaciones críticas.
+2. Escribir tests de formularios con casos válidos e inválidos.
+3. Escribir tests de vistas para permisos y respuestas HTTP.
+4. Escribir tests de integración para flujo: crear alquiler -> pagar -> venta.
+5. Crear fixture inicial para pruebas repetibles.
+6. Medir cobertura y fijar objetivo mínimo (por ejemplo 70%).
+7. Testear consultas optimizadas para evitar N+1 en listados.
+8. Testear exportación CSV y su encabezado esperado.
+9. Testear comando custom de carga de datos.
+10. Crear suite de regresión para bugs reportados por alumnos.
+
+### Bloque J — Gestión, despliegue básico y mantenimiento (91–100)
+
+1. Crear comando `seed_data` con opciones (`--clientes`, `--peliculas`).
+2. Crear comando para limpiar alquileres de prueba.
+3. Implementar backups SQLite con comando y timestamp.
+4. Crear comando para restaurar backup SQLite con confirmación.
+5. Configurar logging a archivo rotativo para errores.
+6. Separar settings por entorno (`base.py`, `dev.py`, `prod.py`).
+7. Agregar chequeos custom en `manage.py check`.
+8. Documentar procedimiento de release (paso a paso).
+9. Documentar plan de rollback ante error en producción.
+10. Preparar checklist final de calidad (tests, migraciones, seguridad, docs).
 
 ---
 

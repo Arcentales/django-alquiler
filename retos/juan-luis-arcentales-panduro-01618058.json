@@ -1,0 +1,12 @@
+{
+    "alumno": "juan luis arcentales panduro",
+    "codigo": "01618058",
+    "token": "NAFESV80A3QH",
+    "rama_obligatoria": "alumno/juan-luis-arcentales-panduro-NAFE",
+    "parametros": {
+        "impuesto": 0.1,
+        "descuento_max": 5,
+        "moneda": "USD",
+        "dias_gracia": 2
+    }
+}
