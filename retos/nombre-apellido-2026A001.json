@@ -1,0 +1,12 @@
+{
+    "alumno": "Nombre Apellido",
+    "codigo": "2026A001",
+    "token": "5DVN3BOAKJYE",
+    "rama_obligatoria": "alumno/nombre-apellido-5DVN",
+    "parametros": {
+        "impuesto": 0.18,
+        "descuento_max": 5,
+        "moneda": "PEN",
+        "dias_gracia": 2
+    }
+}

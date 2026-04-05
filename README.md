@@ -349,3 +349,10 @@ Rúbrica simple (10 puntos):
 ## 15. Licencia y uso educativo
 
 Proyecto pensado para **uso educativo**. Si se publica, conviene aclarar versión de Python/Django y si `db.sqlite3` se ignora en Git (lo habitual).
+
+
+## Entrega
+Alumno: Juan Luis Arcentales Panduro  
+Código: 001618058  
+Token: VZN97VG43E16  
+Rama: alumno/juan-luis-arcentales-panduro-VZN9
