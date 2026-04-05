@@ -1,0 +1,12 @@
+{
+    "alumno": "juan luis arcentales panduro",
+    "codigo": "001618058",
+    "token": "VZN97VG43E16",
+    "rama_obligatoria": "alumno/juan-luis-arcentales-panduro-VZN9",
+    "parametros": {
+        "impuesto": 0.15,
+        "descuento_max": 15,
+        "moneda": "USD",
+        "dias_gracia": 2
+    }
+}
