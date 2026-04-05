@@ -2,6 +2,8 @@
 
 Este documento es el **manual del proyecto** y al mismo tiempo una **guía para el aula**: explica _qué hace la aplicación_, _cómo se construyó_, _qué conceptos de Django practican_ y _qué tareas les sirven para reforzar_.
 
+
+Juan Arcentales
 ---
 
 ## 1. Qué es este proyecto (en una frase)
